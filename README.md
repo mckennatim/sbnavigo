@@ -1,10 +1,26 @@
 ## tags
-### 02_subject_runs_in_products
-TODO refactor so each route is its own component
+### 02_count
+NOT Quite each observable has its own version of ctx
 
+    import count_html from './count.html'
+    import Rx from 'rxjs/Rx';
+
+    const count = ()=>{
+      document.querySelector('#rt').innerHTML = count_html
+      var increaseButton = document.querySelector('#increase');
+      Rx.Observable.fromEvent(increaseButton, 'click')
+        .scan(cxt => cxt+1, 0)
+        .subscribe(cxt=> document.querySelector('#cnt').innerHTML = cxt)
+      var decreaseButton = document.querySelector('#decrease');
+      Rx.Observable.fromEvent(decreaseButton, 'click')
+        .scan(cxt => cxt-1, 0)
+        .subscribe(cxt=> document.querySelector('#cnt').innerHTML = cxt)
+    };
+
+export { count }
 
 ### 01_init_commit
-
+DOESNT work with webpack devserver
 * navigo router using hash tags
 * imports RX and mqtt
 * imports es6 tagged templates and compiles template using `let nav_templ = generateTemplateString(nav_html)({dog: 'Ulysses'})`

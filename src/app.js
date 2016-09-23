@@ -6,8 +6,7 @@ import nav_html from './nav.html'
 import app_html from './app.html'
 import about_html from './about.html'
 import {generateTemplateString} from './util.js'
-
-
+import { count } from './components/count/count'
 
 let app_templ = generateTemplateString(app_html)({dog: 'Ulysses'})
 
@@ -63,6 +62,7 @@ var routing = function(mode){
   router = new Navigo(null, true);
   router
     .on({
+      'count': count,
       'products/:id': function (params) {
         setContent('Products id='+params.id);
         console.log(params.id);
@@ -167,10 +167,10 @@ var init = function () {
   //     hi.unsubscribe()
   //   });  
   Rx.Observable.fromEvent(but2, 'click')
-    .scan(count => count + 1, 0)
-    .subscribe(count => {
-      console.log(`Clicked ${count} times`);
-      console.log(his)
+    .scan(but2cnt => but2cnt + 1, 0)
+    .subscribe(but2cnt => {
+      console.log(`Clicked ${but2cnt} times`);
+      //console.log(his)
       his.unsubscribe()
     });    
 };
@@ -193,4 +193,4 @@ output.subscribe(x => console.log(x));
 
 var clicks = Rx.Observable.fromEvent(document, 'click');
 var result = clicks.throttle(ev => Rx.Observable.interval(1000));
-result.subscribe(x => console.log(x));
+//result.subscribe(x => console.log(x));
