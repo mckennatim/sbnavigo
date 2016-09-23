@@ -4,14 +4,25 @@ import Rx from 'rxjs/Rx';
 const count = ()=>{
 	document.querySelector('#rt').innerHTML = count_html
 	var increaseButton = document.querySelector('#increase');
-	Rx.Observable.fromEvent(increaseButton, 'click')
-		.scan(cxt => cxt+1, 0)
-		.subscribe(cxt=> document.querySelector('#cnt').innerHTML = cxt)
+	var increase = Rx.Observable.fromEvent(increaseButton, 'click')
+		.map(() => state => Object.assign({}, state, {count: state.count + 1}));
+
 	var decreaseButton = document.querySelector('#decrease');
-	Rx.Observable.fromEvent(decreaseButton, 'click')
-		.scan(cxt => cxt-1, 0)
-		.subscribe(cxt=> document.querySelector('#cnt').innerHTML = cxt)
-};
+	var decrease = Rx.Observable.fromEvent(decreaseButton, 'click')
+		.map(() => state => Object.assign({}, state, {count: state.count - 1}));
 
-export { count }
+	var inputElement = document.querySelector('#inp');
+	var input = Rx.Observable.fromEvent(inputElement, 'keypress')
+	  .map(event => state => Object.assign({}, state, {inputValue: event.target.value}));		
 
+	var state = Rx.Observable
+		.merge(increase, decrease, input)
+		.scan((state, changeFn) => changeFn(state), {count: 0})
+
+	state.subscribe((state) => {
+	  document.querySelector('#cnt').innerHTML = state.count;
+	  document.querySelector('#outp').innerHTML = 'Hello ' + state.inputValue;
+	});	
+}
+
+export {count }

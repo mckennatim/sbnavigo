@@ -1,5 +1,37 @@
 ## tags
+### 03_state.subscribe_to_innerHTML
+
+    import count_html from './count.html'
+    import Rx from 'rxjs/Rx';
+
+    const count = ()=>{
+      document.querySelector('#rt').innerHTML = count_html
+      var increaseButton = document.querySelector('#increase');
+      var increase = Rx.Observable.fromEvent(increaseButton, 'click')
+        .map(() => state => Object.assign({}, state, {count: state.count + 1}));
+
+      var decreaseButton = document.querySelector('#decrease');
+      var decrease = Rx.Observable.fromEvent(decreaseButton, 'click')
+        .map(() => state => Object.assign({}, state, {count: state.count - 1}));
+
+      var inputElement = document.querySelector('#inp');
+      var input = Rx.Observable.fromEvent(inputElement, 'keypress')
+        .map(event => state => Object.assign({}, state, {inputValue: event.target.value}));   
+
+      var state = Rx.Observable
+        .merge(increase, decrease, input)
+        .scan((state, changeFn) => changeFn(state), {count: 0})
+
+      state.subscribe((state) => {
+        document.querySelector('#cnt').innerHTML = state.count;
+        document.querySelector('#outp').innerHTML = 'Hello ' + state.inputValue;
+      }); 
+    }
+
+    export {count }
 ### 02_count
+<blockquote>we also need to handle is that multiple observables can update a single state store.
+http://reactivex.io/rxjs/manual/tutorial.html#creating-applications</blockquote>
 NOT Quite each observable has its own version of ctx
 
     import count_html from './count.html'
@@ -16,8 +48,7 @@ NOT Quite each observable has its own version of ctx
         .scan(cxt => cxt-1, 0)
         .subscribe(cxt=> document.querySelector('#cnt').innerHTML = cxt)
     };
-
-export { count }
+    export { count }
 
 ### 01_init_commit
 DOESNT work with webpack devserver

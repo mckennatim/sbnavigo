@@ -14203,16 +14203,33 @@
 	var count = function count() {
 		document.querySelector('#rt').innerHTML = _count2.default;
 		var increaseButton = document.querySelector('#increase');
-		_Rx2.default.Observable.fromEvent(increaseButton, 'click').scan(function (cxt) {
-			return cxt + 1;
-		}, 0).subscribe(function (cxt) {
-			return document.querySelector('#cnt').innerHTML = cxt;
+		var increase = _Rx2.default.Observable.fromEvent(increaseButton, 'click').map(function () {
+			return function (state) {
+				return Object.assign({}, state, { count: state.count + 1 });
+			};
 		});
+	
 		var decreaseButton = document.querySelector('#decrease');
-		_Rx2.default.Observable.fromEvent(decreaseButton, 'click').scan(function (cxt) {
-			return cxt - 1;
-		}, 0).subscribe(function (cxt) {
-			return document.querySelector('#cnt').innerHTML = cxt;
+		var decrease = _Rx2.default.Observable.fromEvent(decreaseButton, 'click').map(function () {
+			return function (state) {
+				return Object.assign({}, state, { count: state.count - 1 });
+			};
+		});
+	
+		var inputElement = document.querySelector('#inp');
+		var input = _Rx2.default.Observable.fromEvent(inputElement, 'keypress').map(function (event) {
+			return function (state) {
+				return Object.assign({}, state, { inputValue: event.target.value });
+			};
+		});
+	
+		var state = _Rx2.default.Observable.merge(increase, decrease, input).scan(function (state, changeFn) {
+			return changeFn(state);
+		}, { count: 0 });
+	
+		state.subscribe(function (state) {
+			document.querySelector('#cnt').innerHTML = state.count;
+			document.querySelector('#outp').innerHTML = 'Hello ' + state.inputValue;
 		});
 	};
 	
@@ -42431,7 +42448,7 @@
 /* 369 */
 /***/ function(module, exports) {
 
-	module.exports = "<button id=\"increase\">increase</button>\r\n<button id=\"decrease\">decrease</button>\r\n<div id=\"cnt\"></div>\r\n<br><br>";
+	module.exports = "<button id=\"increase\">increase</button>\r\n<button id=\"decrease\">decrease</button>\r\n<input type=\"text\" id=\"inp\"> <span id=\"outp\"></span>\r\n<div id=\"cnt\"></div>\r\n<br><br>";
 
 /***/ }
 /******/ ]);
